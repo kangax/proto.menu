@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Proto.Menu Unit Tests</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  
+  <link rel="stylesheet" href="test.css" type="text/css" />
+  <link rel="stylesheet" href="../src/proto.menu.css" type="text/css" />
+  <link rel="stylesheet" href="../src/proto.menu.css" type="text/css" />
+  
+  <style type="text/css" media="screen">
+    #contextArea {
+      background: #eef;
+      height: 200px;
+    }
+  </style>
+  
+  <script src="../lib/prototype.js" type="text/javascript"></script>
+  <script src="../lib/unittest.js" type="text/javascript"></script>
+  <script src="../lib/event_simulate_mouse.js" type="text/javascript"></script>
+  <script src="../src/proto.menu.js" type="text/javascript"></script>
+  
+  <script type="text/javascript">
+    
+    Element.addMethods({
+      getNumStyle: function(element, style) {
+        var value = $(element).getStyle(style);
+        return value === null ? null : parseInt(value);
+      }
+    })
+    
+    document.observe('dom:loaded', function(){
+      
+      var myMenuItems = [
+      	{
+      		name: 'New',
+      		className: 'new',
+      		callback: function(e) {
+            var tagName = e.element().tagName.toLowerCase(),
+                name = e.element(),
+                x = e.pointerX(),
+                y = e.pointerY();
+      			alert('you clicked ' + name + ' option on <' + tagName + '> element at x: ' + x + ', and y: ' + y);
+      		}
+      	},{
+          separator: true
+        },{
+      		name: 'Edit',
+      		className: 'edit', 
+      		callback: function() {
+      			alert('Forward function called');
+      		}
+      	},{
+      		name: 'Copy',
+          className: 'copy', 
+      		callback: function() {
+      			alert('Copy function called');
+      		}
+      	},{
+      		name: 'Delete', 
+      		disabled: true,
+          className: 'delete'
+      	},{
+          separator: true
+        },{
+          name: 'Save',
+          className: 'save',
+          callback: function() {
+            alert('Saving...');
+          }
+        },{
+          separator: true
+        },{
+          name: 'Save as .xsl',
+          className: 'xsl',
+          callback: function() {
+            alert('Saving as .xsl');
+          }
+        },{
+          name: 'Save as .doc',
+          className: 'doc',
+          callback: function() {
+            alert('Saving as .doc');
+          }
+        },{
+          name: 'Save as .pdf',
+          className: 'pdf',
+          callback: function() {
+            alert('Saving as .pdf');
+          }
+        },{
+          separator: true
+        },{
+          name: 'Send to...',
+          disabled: true,
+          className: 'send'
+        }
+      ]
+      
+      new Proto.Menu({
+        selector: '#contextArea',
+        className: 'menu desktop',
+        menuItems: myMenuItems
+      })
+      
+      var menuElement = $$('div.menu')[0],
+          iframeElement = $$('iframe')[0],
+          POINTER_X = 50,
+          POINTER_Y = 50,
+          Z_INDEX = 100;
+
+      new Test.Unit.Runner({
+        
+        testContainerExists: function() { with(this) {
+          assertNotNull(menuElement);
+        }},
+        
+        testShimExists: function() { with(this) {
+          this[Prototype.Browser.IE ? 'assertNotNull' : 'assertNull'](iframeElement);
+        }},
+        
+        testShimIsHidden: function(){ with(this) {
+          if (Prototype.Browser.IE) {
+            assertNotVisible(iframeElement);
+          }
+        }},
+        
+        testContainerIsHidden: function(){ with(this) {
+          assertNotVisible(menuElement);
+        }},
+        
+        testContainerClassName: function(){ with(this) {
+          assert(menuElement.hasClassName('desktop'));
+          assert(menuElement.hasClassName('menu'));
+        }},
+        
+        testContainerMarkup: function(){ with(this) {
+          assertEqual(9, menuElement.select('li a').length);
+          assertEqual(4, menuElement.select('li.separator').length);
+        }},
+        
+        testFirstItem: function(){ with(this) {
+          var element = menuElement.select('li a')[0];
+          
+          assertEqual('New', element.innerHTML);
+          assertEqual('#', element.readAttribute('href'));
+          assertEqual('New', element.readAttribute('title'));
+          assert(element.hasClassName('new'));
+        }},
+        
+        testSecondItem: function(){ with(this) {
+          var element = menuElement.select('li a')[1];
+          
+          assertEqual('Edit', element.innerHTML);
+          assertEqual('#', element.readAttribute('href'));
+          assertEqual('Edit', element.readAttribute('title'));
+          assert(element.hasClassName('edit'));
+        }},
+        
+        testSeparator: function(){ with(this) {
+          var separator = menuElement.select('li')[1];
+          
+          assertNotNull(separator);
+          assertEqual('', separator.innerHTML);
+          assertNull(separator.readAttribute('href'));
+          assert(separator.hasClassName('separator'));
+        }},
+        
+        testDisabledItem: function(){ with(this) {
+          var element = menuElement.select('li a').last();
+          
+          assertEqual('Send to...', element.innerHTML);
+          assertEqual('#', element.readAttribute('href'));
+          assertEqual('Send to...', element.readAttribute('title'));
+          assert(element.hasClassName('disabled'));
+        }},
+        
+        testItemClassName: function(){ with(this) {
+          assert(menuElement.select('li a')[0].hasClassName('new'));
+        }},
+        
+        testContextMenuEvent: function(){ with(this) {
+          Event.simulateMouse('contextArea', Prototype.Browser.Opera ? 'click' : 'contextmenu', {
+            pointerX: POINTER_X,
+            pointerY: POINTER_Y,
+            ctrlKey: true
+          });
+          assertVisible(menuElement);
+          if (Prototype.Browser.IE) {
+            assertVisible(iframeElement);
+          }
+        }},
+        
+        testMenuPosition: function(){ with(this) {
+          assertEqual(POINTER_X, menuElement.getNumStyle('top'));
+          assertEqual(POINTER_Y, menuElement.getNumStyle('left'));
+          assertEqual(Z_INDEX, menuElement.getNumStyle('z-index'));
+        }},
+        
+        testLeftClickEvent: function() { with(this) {
+          Event.simulateMouse('contextArea', 'click');
+          assertNotVisible(menuElement);
+          if (Prototype.Browser.IE) {
+            assertNotVisible(iframeElement);
+          }
+        }}
+      })
+    })
+  </script>
+</head>
+<body>
+  <div id="contextArea"></div>
+  <select>
+      <option>this element should not overlap menu in IE6</option>
+  </select>
+  <div id="testlog"></div>
+</body>
