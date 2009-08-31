@@ -1,9 +1,9 @@
 /** 
- * @description		prototype.js based context menu
+ * @description		Prototype.js based simple context menu
  * @author        Juriy Zaytsev; kangax [at] gmail [dot] com; http://thinkweb2.com/projects/prototype/
- * @version       0.6
- * @date          12/03/07
- * @requires      prototype.js 1.6
+ * @version       0.7
+ * @date          4/17/09
+ * @requires      prototype.js 1.6+
 */
 
 if (Object.isUndefined(Proto)) { var Proto = { } }
@@ -24,9 +24,16 @@ Proto.Menu = Class.create((function(){
 		beforeSelect: e
 	};
 	
+	var isContextMenuSupported = (function(el){
+	  el.setAttribute('oncontextmenu', '');
+	  var result = typeof el.oncontextmenu == 'function';
+	  el = null;
+	  return result;
+	})(document.createElement('div'));
+	
   return {
     initialize: function() {
-  		this.options = Object.extend(defaultOptions, arguments[0] || { });
+  		this.options = Object.extend(Object.clone(defaultOptions), arguments[0] || { });
   		this.shim = new Element('iframe', {
   			style: 'position:absolute;filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0);display:none',
   			src: 'javascript:false;',
@@ -36,7 +43,9 @@ Proto.Menu = Class.create((function(){
   		this.container = new Element('div', {
   		  className: this.options.className, 
   		  style: 'display:none'
-  		});
+  		})
+  		.observe('contextmenu', Event.stop)
+  		.observe('click', this.onClick.bind(this));
   		var list = new Element('ul');
   		this.options.menuItems.each(function(item) {
   			list.insert(
@@ -48,8 +57,6 @@ Proto.Menu = Class.create((function(){
   							title: item.name,
   							className: (item.className || '') + (item.disabled ? ' disabled' : ' enabled')
   						}), { _callback: item.callback })
-  						.observe('click', this.onClick.bind(this))
-  						.observe('contextmenu', Event.stop)
   						.update(item.name)
   				)
   			)
@@ -63,8 +70,8 @@ Proto.Menu = Class.create((function(){
   				this.container.hide();
   			}
   		}.bind(this));
-  		$$(this.options.selector).invoke('observe', Prototype.Browser.Opera ? 'click' : 'contextmenu', function(e){
-  			if (Prototype.Browser.Opera && !e.ctrlKey) {
+  		$$(this.options.selector).invoke('observe', isContextMenuSupported ? 'contextmenu' : 'click', function(e){
+  			if (!isContextMenuSupported && !e.ctrlKey) {
   				return;
   			}
   			this.show(e);
@@ -91,14 +98,16 @@ Proto.Menu = Class.create((function(){
   		this.options.fade ? Effect.Appear(this.container, {duration: 0.25}) : this.container.show();
   		this.event = e;
   	},
-  	onClick: function(e) {
-  		e.stop();
-  		if (e.target._callback && !e.target.hasClassName('disabled')) {
-  			this.options.beforeSelect(e);
-  			if (this.ie) this.shim.hide();
-  			this.container.hide();
-  			e.target._callback(this.event);
-  		}
+  	onClick: function(e, el) {
+  	  if ((el = e.findElement('li a')) && el.descendantOf(this.container)) {
+  	    e.stop();
+  	    if (el._callback && !el.hasClassName('disabled')) {
+    			this.options.beforeSelect(e, el);
+    			if (this.ie) this.shim.hide();
+    			this.container.hide();
+    			el._callback(this.event);
+    		}
+  	  }
   	}
   }
 })());
