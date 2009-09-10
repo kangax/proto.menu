@@ -1,7 +1,7 @@
 /** 
  * @description		Prototype.js based simple context menu
  * @author        Juriy Zaytsev; kangax [at] gmail [dot] com; http://thinkweb2.com/projects/prototype/
- * @version       0.7
+ * @version       0.71
  * @date          4/17/09
  * @requires      prototype.js 1.6+
 */
@@ -11,7 +11,7 @@ if (Object.isUndefined(Proto)) { var Proto = { } }
 Proto.Menu = Class.create((function(){
   
   var e = Prototype.emptyFunction;
-  var ie = Prototype.Browser.IE;
+  var isIE = Prototype.Browser.IE;
   
   var defaultOptions = {
 		selector: '.contextmenu',
@@ -62,11 +62,11 @@ Proto.Menu = Class.create((function(){
   			)
   		}.bind(this));
   		$(document.body).insert(this.container.insert(list).observe('contextmenu', Event.stop));
-  		this.ie && $(document.body).insert(this.shim);
+  		isIE && $(document.body).insert(this.shim);
   		document.observe('click', function(e) {
   			if (this.container.visible() && !e.isRightClick()) {
   				this.options.beforeHide(e);
-  				if (this.ie) this.shim.hide();
+  				if (isIE) this.shim.hide();
   				this.container.hide();
   			}
   		}.bind(this));
@@ -92,7 +92,7 @@ Proto.Menu = Class.create((function(){
   					? (y - elDim.height) : y) + 'px'
   			};
   		this.container.setStyle(elOff).setStyle({zIndex: this.options.zIndex});
-  		if (this.ie) { 
+  		if (isIE) { 
   			this.shim.setStyle(Object.extend(Object.extend(elDim, elOff), {zIndex: this.options.zIndex - 1})).show();
   		}
   		this.options.fade ? Effect.Appear(this.container, {duration: 0.25}) : this.container.show();
@@ -103,7 +103,7 @@ Proto.Menu = Class.create((function(){
   	    e.stop();
   	    if (el._callback && !el.hasClassName('disabled')) {
     			this.options.beforeSelect(e, el);
-    			if (this.ie) this.shim.hide();
+    			if (isIE) this.shim.hide();
     			this.container.hide();
     			el._callback(this.event);
     		}
