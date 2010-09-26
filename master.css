@@ -1,0 +1,52 @@
+body {
+	font: 92%/136% Constantia, "Palatino Linotype", Palatino, Georgia, serif;
+}
+p {
+	margin: 0 0 2em 1em;
+}
+#desc {
+	background: #efefff;
+	border-bottom: 2px solid #ccc;
+	color: #555;
+	padding: 10px;
+	cursor: default;
+}
+pre {
+	font-family: Consolas, "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+	font-size: 11px;
+	padding: 10px;
+}
+ul {
+	margin-bottom: 2em;
+}
+li span {
+	color: #f00;
+}
+a {
+	color: #66f;
+	cursor: pointer;
+}
+li {
+	list-style-type: square;
+	margin-left: 20px;
+}
+h2 {
+	font-size: 1.2em;
+	margin: 0 0 0.5em 0;
+	font-weight: bold;
+	color: #333;
+	padding: 3px;
+}
+strong {
+	font-weight: bold;
+	margin-right: 10px;
+}
+pre.hl {
+	background: #fff;
+	border-left: 1px solid #aaf;
+	margin-bottom: 1.5em;
+	margin-top: 0.5em;
+}
+ol li {
+	list-style: decimal;
+}

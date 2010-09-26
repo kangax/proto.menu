@@ -1,0 +1,236 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+      <meta http-equiv="Content-type" content="text/html; charset=UTF-8" />
+    <title>Proto.Menu :: prototype based context menu</title>
+    
+    <link rel="stylesheet" href="reset.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="master.css" type="text/css" media="screen" />
+    <link rel="stylesheet" href="src/proto.menu.css" type="text/css" media="screen" />
+    
+    <script type="text/javascript" src="lib/prototype.js"></script>
+    <script type="text/javascript" src="lib/effects.js"></script>
+    <script type="text/javascript" src="src/proto.menu.js"></script>
+    
+    <script type="text/javascript">
+      Element.addMethods({
+        getNumStyle: function(element, style) {
+          var value = $(element).getStyle(style);
+          return value === null ? null : parseInt(value);
+        }
+      });
+      document.observe('dom:loaded', function(){
+        var myMenuItems = [
+          {
+            name: 'New',
+            className: 'new',
+            callback: function(e) {
+              var tagName = e.element().tagName.toLowerCase(),
+                  x = e.screenX,
+                  y = e.screenY;
+              alert('you clicked on <' + tagName + '> element at x: ' + x + ', and y: ' + y);
+            }
+          },{
+            separator: true
+          },{
+            name: 'Edit',
+            className: 'edit', 
+            callback: function() {
+              alert('Forward function called');
+            }
+          },{
+            name: 'Copy',
+            className: 'copy', 
+            callback: function() {
+              alert('Copy function called');
+            }
+          },{
+            name: 'Delete', 
+            disabled: true,
+            className: 'delete'
+          },{
+            separator: true
+          },{
+            name: 'Save',
+            className: 'save',
+            callback: function() {
+              alert('Saving...');
+            }
+          },{
+            separator: true
+          },{
+            name: 'Save as .xsl',
+            className: 'xsl',
+            callback: function() {
+              alert('Saving as .xsl');
+            }
+          },{
+            name: 'Save as .doc',
+            className: 'doc',
+            callback: function() {
+              alert('Saving as .doc');
+            }
+          },{
+            name: 'Save as .pdf',
+            className: 'pdf',
+            callback: function() {
+              alert('Saving as .pdf');
+            }
+          },{
+            separator: true
+          },{
+            name: 'Send to...',
+            disabled: true,
+            className: 'send'
+          }
+        ]
+        
+        new Proto.Menu({
+          selector: '#desc',
+          className: 'menu desktop',
+          menuItems: myMenuItems
+        })
+      });
+    </script>
+  </head>
+  <body>
+    <div id='desc'>
+      <h2>Description</h2>
+      <p>Proto.Menu is a simple and lightweight prototype-based solution for context menu functionality on your page</p>
+      <h2>Features:</h2>
+      <ul>
+        <li><span>Lightweight</span>: ~3 KB (~2 KB minified)</li>
+        <li><span>Unobtrusive</span>: Plays nice with JS turned off, uses its own namespace</li>
+        <li><span>Cross-browser</span>: Full A-Graded browsers support (Opera is supported through Ctrl + Left Click)</li>
+        <li><span>Fully customizable</span>: Menu styling can (and is intended to) be easily defined in external stylesheet, supports image-based themes</li>
+        <li><span>Fast</span>: Menu container is rendered on page load, and only changes position when rendered (on click event)</li>
+        <li><span>Thoroughly tested:</span> Features extensive set of <a href="http://proto-menu.googlecode.com/svn/trunk/test/">unit tests</a> to ensure expected behavior</li>
+      </ul>
+      <h2>Specification</h2>
+      <ul>
+          <li>Requires: prototype.js 1.6</li>
+          <li>Tested browsers: Firefox 1.5+, Internet Explorer 6+, Safari 3+, Opera 9+, Netscape Navigator 9+</li>
+          <li>Last modified on: 12/03/07</li>
+          <li>Latest version: 0.6</li>
+          <li>Author: <a href='http://perfectionkills.com/'>kangax</a></li>
+      </ul>
+      <h2>SVN</h2>
+        <ul>
+            <li>The extension now has a public <a href="http://code.google.com/p/proto-menu/">svn (google code)</a></li>
+        </ul>
+      <h2>Demo</h2>
+        <ul>
+          <li>Right click anywhere on a page to bring up a menu. Use "Ctrl + Left Click" if you're in Opera.</li>
+        </ul>
+      <h2>How to use it</h2>
+        <ol>
+          <li>Download <a href="proto.menu.0.6.js" title="Proto.Menu">proto.menu.0.6.js</a> and include it in your page<br/>
+<pre class="hl">
+&lt;script type="text/javascript" src="js/prototype.js"&gt;&lt;/script&gt;
+&lt;script type="text/javascript" src="js/proto.menu.0.6.js"&gt;&lt;/script&gt;
+</pre>
+          </li>
+          <li>There's an <a href="proto.menu.0.6.css" title="CSS file for Proto.Menu">optional CSS file</a> if you do not wish to style menu yourself
+<pre class="hl">
+&lt;link rel="stylesheet" href="proto.menu.0.6.css" type="text/css" media="screen" /&gt;
+</pre>					
+          </li>
+
+          <li>Create an array of links to display in a menu<br/>
+<pre class="hl">
+var myMenuItems = [
+  {
+    name: 'Edit',
+    className: 'edit', 
+    callback: function() {
+      alert('Forward function called');
+    }
+  },{
+    name: 'Copy',
+    className: 'copy', 
+    callback: function() {
+      alert('Copy function called');
+    }
+  },{
+    name: 'Delete', 
+    disabled: true,
+    className: 'delete'
+  },{
+    separator: true
+  },{
+    name: 'Save',
+    className: 'save',
+    callback: function() {
+      alert('Saving...');
+    }
+  }
+]
+</pre>						
+          </li>
+          <li>Initialize Proto.Menu class passing array of links
+<pre class="hl">
+&lt;script type="text/javascript"&gt;
+new Proto.Menu({
+  selector: '#contextArea', // context menu will be shown when element with id of "contextArea" is clicked
+  className: 'menu desktop', // this is a class which will be attached to menu container (used for css styling)
+  menuItems: myMenuItems // array of menu items
+})
+&lt;/script&gt;
+</pre>
+          </li>
+        </ol>
+      <h2>Version history</h2>
+        <ul>
+					<li>
+						<span>v 0.6</span> [12/03/07]
+						<ul>
+							<li>Upgraded to 1.6</li>
+							<li>Added iframe shim to prevent &lt;select&gt; elements having higher z-index than menu (in IE6)</li>
+							<li>Added "beforeShow", "beforeHide" and "beforeSelect" callbacks</li>
+							<li>Added zIndex option</li>
+							<li>Event object is now passed into each callback as a first argument</li>
+							<li>It is now possible to assign className to any menu item (useful for image based themes)</li>
+							<li>The menu's markup is now much more semantic and accessible</li>
+						</ul>
+					</li>
+					<li>
+						<span>v 0.5</span> [8/22/07]
+						<ul>
+							<li>Added Scriptaculous' "fade: true|false" option. When set to true, uses Effect.Appear when showing a menu container</li>
+							<li>Menu now stays within any viewport border</li>
+							<li>Added google theme</li>
+						</ul>
+					</li>
+					<li><span>v 0.4</span>: [8/19/07] 
+						<ul>
+							<li>Completely rewritten to utilize prototype 1.6 (leading to smaller size with more features)</li>
+							<li>Menu item is now an object with following attributes:
+								<ul>
+									<li><strong>name:</strong> menu item name to display in a menu</li>
+									<li><strong>callback:</strong> function to call on click</li>
+									<li><strong>disabled:</strong> true/false indicating disabled option</li>
+									<li><strong>separator:</strong> true/false indicating separator</li>
+								</ul>
+							</li>
+							<li>Menu container now stays within viewport right border</li>
+						</ul>
+					</li>
+					<li><span>v 0.3</span>: [6/16/07] 
+						<ul>
+							<li>Links are now passed as Object of "key: value" pairs instead of an array</li>
+							<li>Added "disabled option" functionality</li>
+							<li>Upgraded prototype version to 1.5.1</li>
+						</ul>
+					</li>
+					<li><span>v 0.2</span>: [6/15/07] Opera is now supported through Ctrl + Left Click</li>
+					<li><span>v 0.1</span>: [4/15/07] Initial release</li>
+				</ul>
+      
+      <h2>P.S.</h2>
+        <ul>
+            <li>Found a bug or have a suggestion? <a href="http://perfectionkills.com/?p=10">Let me know</a></li>
+        </ul>
+    </div>
+  </body>
+</html>
